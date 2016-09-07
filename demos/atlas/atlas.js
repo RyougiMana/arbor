@@ -15,7 +15,7 @@
     }
 
     var that = {
-      init:function(system){
+      init:function(system){//
         particleSystem = system
         particleSystem.screen({padding:[100, 60, 60, 60], // leave some space at the bottom for the param sliders
                               step:.02}) // have the ‘camera’ zoom somewhat slowly as the graph unfolds 
@@ -45,11 +45,11 @@
             ctx.beginPath()
 
             if (!isNaN(weight)) ctx.lineWidth = weight
-            
+
             if (edge.source.data.region==edge.target.data.region){
               ctx.strokeStyle = palette[edge.source.data.region]
             }
-            
+
             // if (color) ctx.strokeStyle = color
             ctx.fillStyle = null
             

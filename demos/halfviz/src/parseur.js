@@ -27,6 +27,8 @@
     var unpack = function(os){
       // process {key1:val1, key2:val2, ...} in a recognized mapping str
       if (!os) return {}
+      else if(os.charAt(1) == '\"')
+        return JSON.parse(os)
 
       var pairs = os.substring(1,os.length-1).split(/\s*,\s*/)
       var kv_data = {}

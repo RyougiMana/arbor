@@ -22,7 +22,7 @@ var Graphics = function(canvas){
 
   var _fontLibrary = {}
   var _fontStyle = {font:"sans-serif",
-                   size:12, 
+                   size:12,
                    align:"left",
                    color:Colors.decode("black"),
                    alpha:1,

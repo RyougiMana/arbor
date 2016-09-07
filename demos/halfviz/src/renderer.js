@@ -26,10 +26,27 @@
           // node: {mass:#, p:{x,y}, name:"", data:{}}
           // pt:   {x:#, y:#}  node position in screen coords
 
-          // determine the box size and round off the coords if we'll be 
-          // drawing a text label (awful alignment jitter otherwise...)
-          var label = node.data.label||""
-          var w = ctx.measureText(""+label).width + 10
+          // ------------ Retrieve Fields And Methods
+          var fields = [];
+          if(node.data.fields)
+            fields = eval(node.data.fields);
+          var methods = [];
+          if(node.data.methods)
+            methods = eval(node.data.methods);
+
+          // ------------ Metric Class Box
+          var label = node.data.label || ""
+          var labelWidth = ctx.measureText("" + label).width
+          var w = labelWidth + 20
+          var elementPicker = function(element) {
+            w = Math.max(w, ctx.measureText(element).width + 4)
+          };
+          fields.forEach(elementPicker);
+          methods.forEach(elementPicker);
+
+          var h = 20 * (1 + fields.length + methods.length)
+
+          // ------------ Metric Mass Center
           if (!(""+label).match(/^[ \t]*$/)){
             pt.x = Math.floor(pt.x)
             pt.y = Math.floor(pt.y)
@@ -37,27 +54,57 @@
             label = null
           }
 
-          // draw a rectangle centered at pt
-          if (node.data.color) ctx.fillStyle = node.data.color
+          // set style for background
+          if (node.data.color)
+            ctx.fillStyle = node.data.color
           else ctx.fillStyle = "rgba(0,0,0,.2)"
-          if (node.data.color=='none') ctx.fillStyle = "white"
 
-          if (node.data.shape=='dot'){
-            gfx.oval(pt.x-w/2, pt.y-w/2, w,w, {fill:ctx.fillStyle})
-            nodeBoxes[node.name] = [pt.x-w/2, pt.y-w/2, w,w]
-          }else{
-            gfx.rect(pt.x-w/2, pt.y-10, w,20, 4, {fill:ctx.fillStyle})
-            nodeBoxes[node.name] = [pt.x-w/2, pt.y-11, w, 22]
+          if (node.data.color == 'none')
+            ctx.fillStyle = "white"
+
+          // draw the box background
+          gfx.rect(pt.x - w/2, pt.y - h/2, w, h, 4, {fill:ctx.fillStyle})
+          nodeBoxes[node.name] = [pt.x - w/2, pt.y - h/2, w, h]
+
+          // set style for foreground
+          ctx.font = "12px Helvetica"
+          ctx.textAlign = "center"
+          ctx.fillStyle = "white"
+          if (node.data.color == 'none') ctx.fillStyle = '#333333'
+
+          // draw the label
+          ctx.fillText(label || "", pt.x, pt.y - h/2 + 14)
+
+          // draw the border
+          ctx.moveTo(pt.x - w/2, pt.y - h/2)
+          ctx.lineTo(pt.x + w/2, pt.y - h/2)
+          ctx.lineTo(pt.x + w/2, pt.y + h/2)
+          ctx.lineTo(pt.x - w/2, pt.y + h/2)
+          ctx.lineTo(pt.x - w/2, pt.y - h/2)
+          ctx.stroke();
+
+          if(fields.length > 0) {
+            // draw the class name - fields spliter
+            ctx.moveTo(pt.x - w/2, pt.y - h/2 + 20)
+            ctx.lineTo(pt.x + w/2, pt.y - h/2 + 20)
+            ctx.stroke();
+
+            // draw the fields
+            ctx.textAlign = 'left'
+            for(var i in fields)
+              ctx.fillText(fields[i], pt.x - w/2 + 2, pt.y - h/2 + 34 + 20 * i);
           }
 
-          // draw the text
-          if (label){
-            ctx.font = "12px Helvetica"
-            ctx.textAlign = "center"
-            ctx.fillStyle = "white"
-            if (node.data.color=='none') ctx.fillStyle = '#333333'
-            ctx.fillText(label||"", pt.x, pt.y+4)
-            ctx.fillText(label||"", pt.x, pt.y+4)
+          if(methods.length > 0) {
+            // draw the fields - methods spliter
+            ctx.moveTo(pt.x - w/2, pt.y - h/2 + 20 + fields.length * 20)
+            ctx.lineTo(pt.x + w/2, pt.y - h/2 + 20 + fields.length * 20)
+            ctx.stroke();
+
+            // draw the methods
+            ctx.textAlign = 'left'
+            for(var i in methods)
+              ctx.fillText(methods[i], pt.x - w/2 + 2, pt.y - h/2 + 34 + 20 * (i + fields.length))
           }
         })    			
 
